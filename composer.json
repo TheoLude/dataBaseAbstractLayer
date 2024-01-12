@@ -1,0 +1,17 @@
+{
+    "name": "extensia/databaseabstractlayer",
+    "description": "A data base abstract layer to connect and query to multiple database system with a single tool.",
+    "type": "package",
+    "authors": [
+        {
+            "name": "Thierry ANDRE",
+            "email": "theo.et.sandrine@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.0",
+        "extensia/errormanager": "1.*"
+    }
+}
