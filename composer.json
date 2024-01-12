@@ -1,6 +1,7 @@
 {
     "name": "extensia/databaseabstractlayer",
-    "description": "A data base abstract layer to connect and query to multiple database system with a single tool.",
+    "version": "1.0.1",
+    "description": "A database abstract layer to connect and query to multiple database system with a single tool.",
     "type": "package",
     "authors": [
         {
