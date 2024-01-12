@@ -1,6 +1,6 @@
 {
     "name": "extensia/databaseabstractlayer",
-    "version": "1.0.1.0",
+    "version": "1.0.1.1",
     "description": "A database abstract layer to connect and query to multiple database system with a single tool.",
     "type": "package",
     "authors": [
@@ -17,7 +17,7 @@
     },
 	"autoload": {
 		"psr-4": {
-			"eXtensia\\dataBaseAbstractLayer\\": "extensia/databaseabstractlayer/src/"
+			"eXtensia\\dataBaseAbstractLayer\\": "src/"
 		}
 	}
 }
