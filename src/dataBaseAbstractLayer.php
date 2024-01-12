@@ -13,13 +13,11 @@ namespace eXtensia\dataBaseAbstractLayer;
 
 class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
-	var $db_type = '';
-	var $db_recordset = Array();
-	var $db_object = '';
-	var $db_current_query = '';
-	var $db_init_db_name = '';
-	var $bool_dbal_erreur = false;
-	var $id_connect;
+	var $strDbType = '';
+	var $tabRecordSet = Array();
+	var $objDbConnexion = '';
+	var $strCurrentQuery = '';
+	var $resIdConnexion;
 
 	/**
 	* @access public
@@ -35,6 +33,8 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
 		global $str_url_connexion_global;
 
+		print(__LINE__." -- OK \r\n");
+		
 		$this -> errorManager((($bool_ges_erreur == true)?'off':'on'));  //[MOD Théo 21/08/2019]  Il faudrait revoir complétement la gestion des erreurs et la classe toute entière ...
 		if (defined('DB_IP_LIST')) $this -> ipTables = explode(',', constant('DB_IP_LIST'));
 		if ($str_connexion == '') {
@@ -47,6 +47,8 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
 		//$this -> dbal_log('<br> current connect string :: '.$str_connexion."\r\n");
 
+		print(__LINE__." -- OK \r\n");
+		
 		// Decomposition et analyse de la chaine de connexion pour recuperer le type
 		if (($int_pos = strpos($str_connexion, '://')) !== false) {
 			$str = substr($str_connexion, 0, $int_pos);
@@ -71,32 +73,34 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 			if (($int_pos = strpos($str_database, '/')) !== false) {
 				$str_ip = substr($str_database, 0, $int_pos);
 				$str_name = substr($str_database, $int_pos + 1);
-				$this -> db_init_db_name = $str_name;
 			}
 		}
+		print(__LINE__." -- OK \r\n");
 
 		// Recherche du fichier de classe PHP correspondant au type de la classe db souhaitee
-		if (! constant('DB_SUBCLASS_PATH')) $this -> errorTracker(5, 'DB_SUBCLASS_PATH n\'est pas d&eacute;fini, la classe dataBaseAbstractLayer ne sait pas situer les fichiers de configurations.');
+		/*if (! constant('DB_SUBCLASS_PATH')) $this -> errorTracker(5, 'DB_SUBCLASS_PATH n\'est pas d&eacute;fini, la classe dataBaseAbstractLayer ne sait pas situer les fichiers de configurations.');
 		if (! @is_file(constant('DB_SUBCLASS_PATH').'db'.$str_type.'.php')) $this -> errorTracker(5, 'Le fichier de d&eacute;finition des m&eacute;thodes de la base '.$str_type.' n\'est pas &agrave; l\'emplacement '.DB_SUBCLASS_PATH.'db'.$str_type.'.php.');
-		else include_once(constant('DB_SUBCLASS_PATH').'db'.$str_type.'.php');
+		else include_once(constant('DB_SUBCLASS_PATH').'db'.$str_type.'.php');*/
+
+		print(__LINE__." -- OK \r\n");
+		//include_once('db'.$str_type.'.php');
 
 		// Instanciation de l'objet db
-		if (! class_exists($str_type)) $this -> errorTracker(5, 'La classe '.$str_type.' n\'est &agrave; priori pas d&eacute;finie dans le fichier '.DB_SUBCLASS_PATH.'db'.$str_type.'.php, la classe dataBaseAbstractLayer ne sait pas situer les fichiers de configurations.');
-		else {
-			$obj_dataBase = new $str_type($str_ip, $str_user, $str_password, $str_name, $bool_ges_erreur);
-			$this -> db_object =& $obj_dataBase;
+		//if (! class_exists($str_type)) $this -> errorTracker(5, 'La classe '.$str_type.' n\'est &agrave; priori pas d&eacute;finie dans le fichier '.DB_SUBCLASS_PATH.'db'.$str_type.'.php, la classe dataBaseAbstractLayer ne sait pas situer les fichiers de configurations.');
+		//else {
+		$obj_dataBase = new $str_type($str_ip, $str_user, $str_password, $str_name, $bool_ges_erreur);
+		$this -> db_object =& $obj_dataBase;
+		print(__LINE__." -- ".print_r($obj_dataBase, true)." \r\n");
 
-			$this -> id_connect = $this -> dbal_connect();
-			if ($this -> id_connect) return $obj_dataBase;
-		}
+		if ($this -> resIdConnexion = $this -> dbal_connect()) return $obj_dataBase;
+		//}
 
-		$this -> bool_dbal_erreur = true;
 		$this -> errorChecker();
 	}
 
 	/**
 	* @access private
-	* Permet de creer la connexion a la base de type $db_type, c'est une methode abstraite qui se contente d'appeler la methode de la
+	* Permet de creer la connexion a la base de type $strDbType, c'est une methode abstraite qui se contente d'appeler la methode de la
 	* classe propre a la base de donnee
 	*
 	* @param object $obj_db - Objet base de donnee cree avec dataBaseAbstractLayer, qui permet de faire une relation a la base selectionnee
@@ -140,7 +144,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
 	/**
 	* @access public
-	* Permet d'executer une requête sur la base de donnee de type $db_type c'est une methode abstraite qui se contente d'appeler la methode
+	* Permet d'executer une requête sur la base de donnee de type $strDbType c'est une methode abstraite qui se contente d'appeler la methode
 	* de la classe propre a la base de donnee
 	*
 	* @param string$ str_requete  - Chaine contenant la requête a effectuer
@@ -149,10 +153,10 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	* @return boolean $bool_result - Renvoie la reussite ou l'echec de la requête
 	*/
 	function dbal_query($str_requete = '', $tab_filter = '', $bool_cesure = true){
-		unset($this -> db_recordset);
+		unset($this -> tabRecordSet);
 		if (! is_string($str_requete) && $str_requete) return $this -> errorTracker(5, 'La requête "<b><i>'.$str_requete.'</i></b>" n\'est pas une chaine, contenu de la variable '.print_r($str_requete, true));
 
-		if ($str_requete == '') $str_requete = $this -> db_current_query."\n";
+		if ($str_requete == '') $str_requete = $this -> strCurrentQuery."\n";
 		else $this -> queryName = $str_requete;
 
 		if ( $bool_cesure ) $str_requete = $this -> _cesure($str_requete, 180);
@@ -160,12 +164,12 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 		if (defined('DB_LOG')) {
 			if (constant('DB_LOG') != '') $this -> dbal_log($str_requete);
 		}
-
+		print(__LINE__." -- ".print_r($this -> db_object, true)." \r\n");
 		return $this -> db_object -> db_query($str_requete, $this -> queryName);
 	}
 
 	function dbal_rs_query($str_requete = '', $str_message = ''){
-		if ($str_requete == '') $str_requete = $this -> db_current_query;
+		if ($str_requete == '') $str_requete = $this -> strCurrentQuery;
 		else $this -> queryName = $str_requete;
 
 		if (constant('DB_LOG') != '') $this -> dbal_log($str_requete);
@@ -248,7 +252,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	function dbal_log($str_requete){
 		/*if (in_array(getenv('REMOTE_ADDR'), $this -> ipTables)){
 		list($usec, $sec) = explode(' ', microtime());
-		if ($this -> db_current_query) $str_pre = ' - "'.$this -> queryName.'"';
+		if ($this -> strCurrentQuery) $str_pre = ' - "'.$this -> queryName.'"';
 		else $str_pre = '';
 
 		$str_message = date('d/m/Y H:i:s').':'.substr($usec, 2).$str_pre.' - '.$str_requete."\r\n";
@@ -289,7 +293,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 		//si MetaObject est include dans l'application, tenir compte des quotes magiques de MetaObject
 		if (defined('MO_MAGIC_DYNAMIC_QUOTE_CODE')) $str_query = str_replace(constant('MO_MAGIC_DYNAMIC_QUOTE_CODE'),'"',$str_query);
 
-		$this -> db_current_query = $str_query;
+		$this -> strCurrentQuery = $str_query;
 		return $str_query;
 	}
 
@@ -299,7 +303,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	*
 	*/
 	function dbal_get_last_query(){
-		return $this -> db_current_query;
+		return $this -> strCurrentQuery;
 	}
 
 	/**
@@ -355,15 +359,15 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 			while (list($key, $value) = each($tab_tmpZ)){
 				// suppression des indices numeriques dans le cas de MySQL par exemple
 				if (is_string($key)){
-					$this -> db_recordset[$i][$key] = $this -> dbal_unescape_value($value);
+					$this -> tabRecordSet[$i][$key] = $this -> dbal_unescape_value($value);
 				}
 			}
 			$i ++;
 		}
-		if (is_array($this -> db_recordset)) reset($this -> db_recordset);
-		$this -> db_recordset_index = 1;
+		if (is_array($this -> tabRecordSet)) reset($this -> tabRecordSet);
+		$this -> intRecordSetIndex = 1;
 
-		return $this -> db_recordset;
+		return $this -> tabRecordSet;
 	}
 
 	/**
@@ -375,7 +379,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	* @return void
 	*/
 	function dbal_rs_start(){
-		return $this -> db_recordset[1];
+		return $this -> tabRecordSet[1];
 	}
 
 	/**
@@ -387,7 +391,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	* @return void
 	*/
 	function dbal_rs_end(){
-		return $this -> db_recordset[count($this -> db_recordset)];
+		return $this -> tabRecordSet[count($this -> tabRecordSet)];
 	}
 
 	/**
@@ -399,8 +403,8 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	*@return void
 	*/
 	function dbal_rs_next(){
-		if ($this -> db_recordset_index == count($this -> db_recordset)) return false;
-		return $this -> db_recordset[$this -> db_recordset_index ++];
+		if ($this -> intRecordSetIndex == count($this -> tabRecordSet)) return false;
+		return $this -> tabRecordSet[$this -> intRecordSetIndex ++];
 	}
 
 	/**
@@ -412,8 +416,8 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	*@return void
 	*/
 	function dbal_rs_preview(){
-		if ($this -> db_recordset_index < 1) return false;
-		return $this -> db_recordset[$this -> db_recordset_index --];
+		if ($this -> intRecordSetIndex < 1) return false;
+		return $this -> tabRecordSet[$this -> intRecordSetIndex --];
 	}
 
 	/**
@@ -425,8 +429,8 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	*@return void
 	*/
 	function dbal_rs_moveto($int_index){
-		if ($int_index < 0 || $int_index > count($this -> db_recordset)) return false;
-		return $this -> db_recordset[$int_index];
+		if ($int_index < 0 || $int_index > count($this -> tabRecordSet)) return false;
+		return $this -> tabRecordSet[$int_index];
 	}
 
 	/**
@@ -462,7 +466,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 	* @return integer $int_num - Le nombre d'enregistrements concernes par la dernière requête
 	*/
 	function dbal_num_rows(){
-		if (count($this -> db_recordset) > 0) return count($this -> db_recordset);
+		if (count($this -> tabRecordSet) > 0) return count($this -> tabRecordSet);
 		else return $this -> db_object -> db_num_rows();
 	}
 
