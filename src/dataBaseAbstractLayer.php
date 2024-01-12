@@ -36,7 +36,7 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 		global $str_url_connexion_global;
 
 		$this -> errorManager((($bool_ges_erreur == true)?'off':'on'));  //[MOD Théo 21/08/2019]  Il faudrait revoir complétement la gestion des erreurs et la classe toute entière ...
-		$this -> ipTables = explode(',', constant('DB_IP_LIST'));
+		if (defined('DB_IP_LIST')) $this -> ipTables = explode(',', constant('DB_IP_LIST'));
 		if ($str_connexion == '') {
 			if (defined('DB_CONNEXION')) $str_connexion = constant('DB_CONNEXION');
 			else {
@@ -157,7 +157,9 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
 		if ( $bool_cesure ) $str_requete = $this -> _cesure($str_requete, 180);
 
-		if (constant('DB_LOG') != '') $this -> dbal_log($str_requete);
+		if (defined('DB_LOG')) {
+			if (constant('DB_LOG') != '') $this -> dbal_log($str_requete);
+		}
 
 		return $this -> db_object -> db_query($str_requete, $this -> queryName);
 	}
