@@ -11,7 +11,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class dataBaseAbstractLayer extends eXtensia\errorManager\errorManager {
+class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
 	var $db_type = '';
 	var $db_recordset = Array();
