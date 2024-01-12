@@ -77,8 +77,8 @@ class dataBaseAbstractLayer extends \eXtensia\errorManager\errorManager {
 
 		// Recherche du fichier de classe PHP correspondant au type de la classe db souhaitee
 		if (! constant('DB_SUBCLASS_PATH')) $this -> errorTracker(5, 'DB_SUBCLASS_PATH n\'est pas d&eacute;fini, la classe dataBaseAbstractLayer ne sait pas situer les fichiers de configurations.');
-		if (! @is_file(DB_SUBCLASS_PATH.'db'.$str_type.'.php')) $this -> errorTracker(5, 'Le fichier de d&eacute;finition des m&eacute;thodes de la base '.$str_type.' n\'est pas &agrave; l\'emplacement '.DB_SUBCLASS_PATH.'db'.$str_type.'.php.');
-		else include_once(DB_SUBCLASS_PATH.'db'.$str_type.'.php');
+		if (! @is_file(constant('DB_SUBCLASS_PATH').'db'.$str_type.'.php')) $this -> errorTracker(5, 'Le fichier de d&eacute;finition des m&eacute;thodes de la base '.$str_type.' n\'est pas &agrave; l\'emplacement '.DB_SUBCLASS_PATH.'db'.$str_type.'.php.');
+		else include_once(constant('DB_SUBCLASS_PATH').'db'.$str_type.'.php');
 
 		// Instanciation de l'objet db
 		if (! class_exists($str_type)) $this -> errorTracker(5, 'La classe '.$str_type.' n\'est &agrave; priori pas d&eacute;finie dans le fichier '.DB_SUBCLASS_PATH.'db'.$str_type.'.php, la classe dataBaseAbstractLayer ne sait pas situer les fichiers de configurations.');

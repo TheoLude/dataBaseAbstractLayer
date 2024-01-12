@@ -19,7 +19,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class Sybase extends errorManager {
+class Sybase extends \eXtensia\errorManager\errorManager {
 
 	var $db_connexion = '';
 	var $db_ip = '';

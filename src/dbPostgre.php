@@ -17,7 +17,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class Postgre extends errorManager {
+class Postgre extends \eXtensia\errorManager\errorManager {
 
 	var $db_connexion = '';
 	var $db_ip = '';

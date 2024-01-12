@@ -13,7 +13,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class Oracle extends errorManager {
+class Oracle extends \eXtensia\errorManager\errorManager {
 
 	var $db_ges_erreur = false;
 	var $db_connexion = '';

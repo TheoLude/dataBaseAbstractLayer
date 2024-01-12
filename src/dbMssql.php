@@ -17,7 +17,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class Mssql extends errorManager {
+class Mssql extends \eXtensia\errorManager\errorManager {
 
 	var $db_ges_erreur = false;
 	var $db_connexion = '';

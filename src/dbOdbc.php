@@ -24,7 +24,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class Odbc extends errorManager {
+class Odbc extends \eXtensia\errorManager\errorManager {
 
 	var $db_connexion = '';
 	var $db_dsn = '';

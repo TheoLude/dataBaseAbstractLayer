@@ -14,7 +14,7 @@
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class Mysql extends errorManager {
+class Mysql extends \eXtensia\errorManager\errorManager {
 
 	var $db_connexion = '';
 	var $db_ip = '';
