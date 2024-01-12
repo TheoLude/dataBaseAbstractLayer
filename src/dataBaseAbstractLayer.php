@@ -7,14 +7,11 @@
 * @author [Theo] - 28 mai 2002
 * @version 1.3
 *
-* @package caliObject
-* @subpackage caliSQLObject
-*
 */
 
 namespace eXtensia\dataBaseAbstractLayer;
 
-class dataBaseAbstractLayer extends errorManager {
+class dataBaseAbstractLayer extends eXtensia\errorManager\errorManager {
 
 	var $db_type = '';
 	var $db_recordset = Array();
@@ -202,25 +199,6 @@ class dataBaseAbstractLayer extends errorManager {
 
 	function _cesure($str_chaine, $int_size = 100){
 
-		// Add on Special SQLserver pour biaiser le comportement de son cache qui apparemment pose probleme
-		// [Theo 31/10/2002]
-		// [DEL Théo 02/05/2016] Plus nécessaire avec les nouvelles versions de SQL server
-		/*
-		if ($this -> db_type == 'Mssql' && constant('MSSQL_DEBUG_MODE')) {
-		if (preg_match_all('/^SELECT(.+) FROM/i', $str_chaine, $tab_tmp)) {
-		$tab_res = explode(',', $tab_tmp[1][0]);
-		$last_field = $tab_res[count($tab_res) - 1];
-		if (! preg_match('/( FROM )|( SELECT )|( IN )|( AS )|( DISTINCT )|\*|( TOP [0-9]* )/i', $last_field)){
-		srand(microtime() * 10000);
-		$str_liste = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		for($i = 0; $i < 5; $i++){
-		$str_rnd .= substr($str_liste,rand(0,strlen($str_liste)), 1);
-		}
-		//$str_chaine = str_replace('FROM', ', CAST('.$last_field." AS varchar) + '".$str_rnd."' FROM", $str_chaine);
-		}
-		}
-		}*/
-
 		$int_pos = 0;
 		$str_requete = '';
 
@@ -334,13 +312,6 @@ class dataBaseAbstractLayer extends errorManager {
 	function dbal_fetch(&$tab_return_data){
 		if ($this -> db_type == 'Odbc')  $this -> db_object -> db_fetch($tab_return_data);
 		else $tab_return_data = $this -> db_object -> db_fetch();
-
-		/*if ($tab_return_data) {
-		foreach ( $tab_return_data as $key => $value ) {
-		//$value = str_replace("\n", '', $value);
-		//$value = str_replace("\r", '', $value);
-		$tab_return_data[$key] = $value;
-		}*/
 
 		return $tab_return_data;
 	}
