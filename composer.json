@@ -14,5 +14,10 @@
     "require": {
         "php": ">=5.0",
         "extensia/errormanager": "1.*"
-    }
+    },
+	"autoload": {
+		"psr-4": {
+			"eXtensia\\dataBaseAbstractLayer\\": "src"
+		}
+	}
 }
